@@ -1,12 +1,4 @@
 
-/** ***************************************** */
-/*                                          */
-/* Copyright (c) 2018 AoEncry */
-/* @author bgu, pgao, zyang */
-/*                                          */
-/** ***************************************** */
-
-
 var AoEncryJS = AoEncryJS || (function(Math, undefined) {
 	var C = {};
 	var fK = C.gM = {};
