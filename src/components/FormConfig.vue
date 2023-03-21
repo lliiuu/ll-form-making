@@ -1,0 +1,38 @@
+<template>
+  <div class="form-config-container">
+    <el-form label-position="top" @submit.native.prevent>
+      <el-form-item label="标签对齐方式">
+        <el-radio-group size="mini" v-model="data.labelPosition">
+          <el-radio-button label="left">左对齐</el-radio-button>
+          <el-radio-button label="right">右对齐</el-radio-button>
+          <el-radio-button label="top">顶部对齐</el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+
+      <el-form-item label="表单字段宽度">
+        <el-input-number size="mini" :precision="0" v-model="data.labelWidth" @change="numberChange('labelWidth',100)" :min="0" :max="200" :step="1"></el-input-number>
+      </el-form-item>
+
+      <el-form-item label="组件尺寸">
+        <el-radio-group size="mini" v-model="data.size">
+          <el-radio-button label="medium">medium</el-radio-button>
+          <el-radio-button label="small">small</el-radio-button>
+          <el-radio-button label="mini">mini</el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+    </el-form>
+  </div>
+</template>
+
+<script>
+export default {
+  props: ['data'],
+  methods:{
+    numberChange(attr,value){
+      this.$nextTick(() => {
+        this.data[attr] = this.data[attr] == undefined ? value : this.data[attr];
+      })
+    }
+  }
+}
+</script>
