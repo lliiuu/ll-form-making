@@ -13,19 +13,27 @@
       <template v-if="widget.options.isEncryption">
         <div :style="{ width: widget.options.width + '%' }">
           <div style="position:relative;display:inline-block;"
-            :style="{ 'width': widget.options.isEdit ? '80%' : '100%', 'float': 'left', 'margin-right': '10px' }">
+            :style="{ 'width': '100%', 'float': 'left', 'margin-right': '10px' }">
             <el-input :key="passwordType.pwdType" ref="pwdType" :type="passwordType.pwdType" v-model.trim="dataModel"
               maxlength="500"
               :disabled="widget.options.disabled ? true : widget.options.isEdit ? widget.options.passwordDisabled : false"
-              :placeholder="widget.options.placeholder"></el-input>
+              :placeholder="widget.options.placeholder">
+              <template slot="suffix">
+                <div>
+                  <el-checkbox-group class="pwd-checkbox" v-if="widget.options.isEdit" v-model="isEditArr"
+                    :title="widget.options.passwordDisabled ? '修改' : '还原'">
+                    <el-checkbox :disabled="widget.options.disabled" @change="editChange" :label="1" name="type"><i
+                        class="el-icon-edit"></i>
+                    </el-checkbox>
+                  </el-checkbox-group>
+                </div>
+
+              </template>
+            </el-input>
             <span class="show-pwd" @click="showPwd('pwdType')">
               <svg-icon :icon-class="passwordType.pwdType === 'password' ? 'eye' : 'eye-open'" />
             </span>
           </div>
-          <el-checkbox-group style="float:left;" v-if="widget.options.isEdit" v-model="isEditArr">
-            <el-checkbox :disabled="widget.options.disabled" @change="editChange" :label="1" name="type">修改
-            </el-checkbox>
-          </el-checkbox-group>
         </div>
       </template>
 
@@ -160,19 +168,27 @@
                     required: this.widget.options.required, message: '密码不能为空。', trigger: 'blur'
                   }">
                     <div style="position:relative;display:inline-block;"
-                      :style="{ 'width': widget.options.isEdit ? '60%' : '100%', 'float': 'left', 'margin-right': '10px' }">
+                      :style="{ 'width': '100%', 'float': 'left', 'margin-right': '10px' }">
                       <el-input v-model.trim="dataModel.userPassword" :key="passwordType.pwdType1" ref="pwdType1"
                         maxlength="500" :type="passwordType.pwdType1"
                         :disabled="widget.options.disabled ? true : widget.options.isEdit ? widget.options.passwordDisabled : false"
-                        placeholder="请输入密码"></el-input>
+                        placeholder="请输入密码">
+                        <template slot="suffix">
+                          <div>
+                            <el-checkbox-group class="pwd-checkbox" v-if="widget.options.isEdit" v-model="isEditArr"
+                              :title="widget.options.passwordDisabled ? '修改' : '还原'">
+                              <el-checkbox :disabled="widget.options.disabled" @change="editChange" :label="1"
+                                name="type"><i class="el-icon-edit"></i>
+                              </el-checkbox>
+                            </el-checkbox-group>
+                          </div>
+
+                        </template>
+                      </el-input>
                       <span class="show-pwd" @click="showPwd('pwdType1')">
                         <svg-icon :icon-class="passwordType.pwdType1 === 'password' ? 'eye' : 'eye-open'" />
                       </span>
                     </div>
-                    <el-checkbox-group style="float:left;" v-if="widget.options.isEdit" v-model="isEditArr">
-                      <el-checkbox :disabled="widget.options.disabled" @change="editChange" :label="1" name="type">修改
-                      </el-checkbox>
-                    </el-checkbox-group>
                   </el-form-item>
                 </template>
               </el-col>
@@ -278,7 +294,7 @@ import FmUpload from "./Upload";
 import FmEditor from "./Editor/tinymce";
 import request from "../util/request.js";
 import { Sm3Utils } from "../util/utils/SmCrypto.js";
-import { checkFileName } from "../util/index"
+import { checkFileName } from "../util/index";
 import { async } from "q";
 export default {
   props: ["widget", "models", "rules", "remote", "isEdit", "action", "uploadType"],
@@ -439,18 +455,18 @@ export default {
       const isNone = file.size != 0;
       if (!isToken && this.widget.type == 'fileupload') {
         this.$message.warning("当前页面不支持此功能!");
-        return false
+        return false;
       }
       if (!isLt2M) {
         this.$message.error("文件大小不能超过 100MB!");
-        return false
+        return false;
       }
 
       if (!isJPG) {
         this.$message.error(
           `文件必须是 ${this.widget.options.accep} 结尾的文件!`
         );
-        return false
+        return false;
       }
       if (!checkFileName(file.name)) {
         this.$message.error('文件名只能包含“-”特殊字符，不支持其他特殊字符!');
@@ -458,11 +474,11 @@ export default {
       }
       if (!isStr30) {
         this.$message.error("文件名称长度不能超过30个字符！");
-        return false
+        return false;
       }
       if (!isNone) {
         this.$message.error("文件大小不能为 0KB!");
-        return false
+        return false;
       }
 
       if (this.widget.type == 'fileupload') {
@@ -534,11 +550,11 @@ export default {
     },
     importPlugs() {
       // 选择文件
-      let fileArr = []
+      let fileArr = [];
       if (this.widget.options.accep !== '') {
         fileArr = this.widget.options.accep.split(",");
       }
-      console.log(fileArr)
+      console.log(fileArr);
       const fileDirs = window.ipcSendSync('showOpenDialog', {
         properties: ['openFile'],
         filters: [{ name: 'filter', extensions: fileArr }]
@@ -550,15 +566,15 @@ export default {
       });
       if (isAllowFile || !this.widget.options.accep) {
         // 获取插件配置信息
-        this.importPlugin(fileDir)
+        this.importPlugin(fileDir);
       } else {
-        this.$message.error(`文件必须是 ${this.widget.options.accep} 结尾的文件!`)
+        this.$message.error(`文件必须是 ${this.widget.options.accep} 结尾的文件!`);
       }
 
     },
     importPlugin(fileDir) {
       this.dataModel = fileDir;
-      this.$message.success(`文件上传成功`)
+      this.$message.success(`文件上传成功`);
     },
     dropListener(e) {
       //阻止默认行为
@@ -574,9 +590,9 @@ export default {
           return item == fileName.split(".")[fileName.split(".").length - 1];
         });
         if (isAllowFile || !this.widget.options.accep) {
-          this.importPlugin(path)
+          this.importPlugin(path);
         } else {
-          this.$message.error(`文件必须是 ${this.widget.options.accep} 结尾的文件!`)
+          this.$message.error(`文件必须是 ${this.widget.options.accep} 结尾的文件!`);
         }
         console.log('path:', path);
       }
@@ -623,5 +639,9 @@ export default {
   color: #999;
   cursor: pointer;
   user-select: none;
+}
+
+.pwd-checkbox .el-checkbox__inner {
+  display: none;
 }
 </style>
